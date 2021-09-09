@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <title>URL記録アプリ</title>
+</head>
+
+<body>
+  <!-- URL取得ボタン -->
+  <div class="check-wrapper">
+    <input type="button" value="check" id="btnCheck">
+   </div>
+
+  <div class="text-wrapper">
+        <p>サイト名</p>
+        <textarea name="" id="sitename" cols="40" rows="2"></textarea> 
+
+        <p>URL</p>
+        <textarea name="" id="urlname" cols="40" rows="2"></textarea> 
+    
+        <p>memo</p>
+        <textarea name="" id="memo-text" cols="40" rows="6"></textarea> 
+    </div>
+
+  <div>
+    <!-- 送信ボタン -->
+    <button id="send" class="button-wrapper">送信</button>
+  </div>
+
+  
+    <!-- 保存されたデータが表示される箇所 -->
+    <div id="output" class="output-wrapper"></div>
+ 
+
+  <!-- JQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase.js"></script>
+  
+
+
+
+    <script>
+//    firebase
+        var firebaseConfig = {
+            apiKey: "",
+            authDomain: "dev21chat-b1979.firebaseapp.com",
+            databaseURL: "https://dev21chat-b1979-default-rtdb.firebaseio.com/",
+            projectId: "dev21chat-b1979",
+            storageBucket: "dev21chat-b1979.appspot.com",
+            messagingSenderId: "71988911819",
+            appId: "1:71988911819:web:9e627ad85f9e283943854e"
+            };
+      
+        firebase.initializeApp(firebaseConfig);
+
+        
+        const newPostRef = firebase.database().ref();
+       
+        $("#send").on("click", function () {
+
+        newPostRef.push({
+            sitename: $("#sitename").val(), //名前
+            text: $("#urlname").val(), //テキストエリア
+            memo: $("#memo-text").val(), //テキストエリア
+        })
+        $("#urlname").val(""); //空にする
+        $("#sitename").val(""); //空にする
+        });
+
+        // 受信処理
+        newPostRef.on("child_added", function (data) {
+        let v = data.val(); //ここに保存されたデータが全て入ってくる
+     
+        console.log(v); //vの変数に入っているオブジェクトを全てみる
+
+        let str = `<p>${v.sitename}<br>${v.text}<br>${v.memo}</p>`;
+
+        // ここでデータをhtmlに埋め込む
+        $("#output").prepend(str);
+        })
+
+        $("#urlname").on("keydown", function (e) {
+        console.log(e, "event");
+
+        // エンターキーを押したら送信処理を実行
+        if (e.keyCode === 13) {
+            newPostRef.push({
+            sitename: $("#sitename").val(), //名前
+            text: $("#urlname").val(), //テキストエリア
+            })
+            $("#urlname").val(""); //空にする
+            $("#sitename").val(""); //空にする
+        }
+        })
+
+
+        // サイト名・URL名取得
+        let sitename = document.getElementById('sitename');
+        let urlname = document.getElementById('urlname');
+
+        let btnCheck = document.getElementById('btnCheck');
+        btnCheck.addEventListener('click', function(){
+            
+        var titlename = document.title;
+        var titlenameT = String( titlename ); 
+        sitename.insertAdjacentHTML('beforeend',titlenameT);
+        
+        var urlLocation = String(location.href);
+        urlname.insertAdjacentHTML('beforeend',urlLocation);
+
+        
+    }); 
+
+    </script>
+
+    <!-- css -->
+    <style type="text/css">
+
+
+        body{
+            background-color: #00b7ce;
+            max-width: 700px;
+        }
+
+        .text-wrapper{
+            display: flex;
+            max-width: 700px;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px auto;
+
+        }
+
+        .check-wrapper{
+            display: flex;
+            max-width: 700px;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px auto;
+            border: none;
+            font-size: 15px;
+        }
+
+
+        .button-wrapper{
+            display: flex;
+            max-width: 700px;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px auto;
+            border: none;
+            font-size: 15px;
+        }
+
+        .output-wrapper{
+            display: flex;
+            flex-wrap: wrap;
+            flex-flow: column nowrap;
+            max-width: 300px;
+            margin: 10px auto;
+       }
+
+        p{
+            word-break: break-all;
+            width: 300px;   
+            width:100%; 
+            color: white;
+            font-weight: bold;
+        }
+
+    </style>
+
+</body>
+
+
+
+
+</html>
